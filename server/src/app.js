@@ -6,6 +6,7 @@ import { config } from './config/index.js';
 import { apiRouter } from './routes/api.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
+import { logger } from './utils/logger.js';
 
 export const app = express();
 
@@ -50,7 +51,26 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-// Health Check
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    logger.info(`${req.method} ${req.originalUrl} ${res.statusCode} (${Date.now() - start}ms)`);
+  });
+  next();
+});
+
+// Root & Health Check endpoints
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'IntelliDecision AI API Engine',
+    version: '1.0.0',
+    baseApi: '/api/v1',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',

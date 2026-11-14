@@ -45,22 +45,23 @@ export const recommendationController = {
       const recData = aiResult.data;
 
       // Save recommendation to database
+      const reasoningList = Array.isArray(recData.reasoning) ? recData.reasoning : [];
       const saved = await dbService.saveRecommendation(userId, projectId, {
         recommended_alternative_id: recData.recommended_alternative_id,
         recommendation_type: recData.recommendation_type,
         recommendation_summary: recData.recommendation_summary,
         explanation: {
-          reasoning: recData.reasoning,
-          advantages: recData.advantages,
-          disadvantages: recData.disadvantages,
-          alternative_options: recData.alternative_options,
-          conditions_for_reassessment: recData.conditions_for_reassessment,
+          reasoning: reasoningList,
+          advantages: recData.advantages || [],
+          disadvantages: recData.disadvantages || [],
+          alternative_options: recData.alternative_options || [],
+          conditions_for_reassessment: recData.conditions_for_reassessment || [],
         },
-        supporting_evidence: recData.reasoning.flatMap(r => r.evidence_ids || []),
-        risks: recData.risks,
-        assumptions: recData.assumptions,
-        uncertainties: recData.uncertainties,
-        confidence_level: recData.confidence_level,
+        supporting_evidence: reasoningList.flatMap(r => r.evidence_ids || []),
+        risks: recData.risks || [],
+        assumptions: recData.assumptions || [],
+        uncertainties: recData.uncertainties || [],
+        confidence_level: recData.confidence_level || 'moderate',
         model_name: aiResult.modelUsed,
         prompt_version: aiResult.promptVersion,
       });

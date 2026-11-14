@@ -15,6 +15,10 @@ let aiClient = null;
 
 function getClient() {
   if (!aiClient && config.gemini.apiKey) {
+    if (!config.gemini.apiKey.startsWith('AIzaSy')) {
+      logger.warn('[GeminiService] GEMINI_API_KEY does not start with AIzaSy (standard Google AI Studio format). Using deterministic calculation engine.');
+      return null;
+    }
     aiClient = new GoogleGenAI({ apiKey: config.gemini.apiKey });
   }
   return aiClient;
@@ -86,16 +90,24 @@ async function callGeminiStructured({ prompt, schema, fallbackGenerator, evidenc
     try {
       logger.info(`[GeminiService] Sending structured AI request (attempt ${attempt}/${config.gemini.maxRetries})...`);
 
-      const response = await client.models.generateContent({
-        model: config.gemini.model,
-        contents: [
-          { role: 'user', parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }] },
-        ],
-        config: {
-          responseMimeType: 'application/json',
-          maxOutputTokens: config.gemini.maxOutputTokens,
-        },
-      });
+      const timeoutMs = Math.min(config.gemini.timeoutMs || 5000, 8000);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`AI generation timed out after ${timeoutMs}ms`)), timeoutMs)
+      );
+
+      const response = await Promise.race([
+        client.models.generateContent({
+          model: config.gemini.model,
+          contents: [
+            { role: 'user', parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }] },
+          ],
+          config: {
+            responseMimeType: 'application/json',
+            maxOutputTokens: config.gemini.maxOutputTokens,
+          },
+        }),
+        timeoutPromise,
+      ]);
 
       const rawText = response.text || '';
       const parsed = extractJSON(rawText);
