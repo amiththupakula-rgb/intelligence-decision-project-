@@ -1,0 +1,29 @@
+{
+  "name": "intellidecision-ai-root",
+  "version": "1.0.0",
+  "description": "IntelliDecision AI – Explainable AI-Powered Decision Intelligence System",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev",
+    "start": "node server/src/server.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:migrate:status": "node scripts/migrate.js --status",
+    "build": "npm --prefix client run build"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1"
+  },
+  "keywords": [
+    "decision-intelligence",
+    "explainable-ai",
+    "gemini",
+    "supabase",
+    "analytics"
+  ],
+  "author": "IntelliDecision AI Team",
+  "license": "MIT"
+}

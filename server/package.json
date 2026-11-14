@@ -1,0 +1,29 @@
+{
+  "name": "intellidecision-ai-server",
+  "version": "1.0.0",
+  "description": "Backend API and Decision Intelligence Engine for IntelliDecision AI",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@google/genai": "^0.3.1",
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "pg": "^8.13.1",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
+    "uuid": "^11.0.5",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.1"
+  }
+}
