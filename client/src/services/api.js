@@ -1,4 +1,13 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
+// On deployed hosting (e.g. Vercel), ensure we never try to call local port 5000 from client
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  if (rawBaseUrl.includes('localhost') || rawBaseUrl.includes('127.0.0.1')) {
+    rawBaseUrl = '/api/v1';
+  }
+}
+
+const BASE_URL = rawBaseUrl;
 
 class ApiClient {
   getToken() {
